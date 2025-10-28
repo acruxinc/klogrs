@@ -1,6 +1,82 @@
 [package]
 name = "klogrs"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
+authors = ["Shaik Baleeghuddin Kashif <kashif@sbkashif.com>"]
+license = "MIT OR Apache-2.0"
+description = "A high-performance, feature-rich structured logging library for Rust, inspired by zerolog but with enhanced capabilities"
+homepage = "https://github.com/acruxinc/klogrs"
+repository = "https://github.com/acruxinc/klogrs"
+documentation = "https://docs.rs/klogrs"
+readme = "README.md"
+keywords = ["logging", "structured", "json", "performance", "async"]
+categories = ["development-tools::debugging"]
+include = [
+    "src/**/*",
+    "examples/**/*",
+    "README.md",
+    "LICENSE*",
+    "CHANGELOG.md"
+]
+
+[features]
+default = ["std", "colors", "json"]
+std = []
+colors = ["dep:colored"]
+json = ["dep:serde_json"]
+file = ["std"]
+rotating = ["file", "dep:chrono"]
+async = ["dep:tokio"]
+serde = ["dep:serde"]
+tracing = ["dep:tracing-core"]
 
 [dependencies]
+# Core dependencies
+chrono = { version = "0.4", features = ["serde"], optional = false }
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
+colored = { version = "2.0", optional = true }
+
+# Concurrency
+once_cell = "1.19"
+parking_lot = "0.12"
+
+# Optional async support
+tokio = { version = "1.0", features = ["rt", "io-util", "fs"], optional = true }
+
+# Optional tracing integration
+tracing-core = { version = "0.1", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["rt", "macros", "time"] }
+criterion = "0.5"
+tempfile = "3.0"
+env_logger = "0.10"
+
+[[bench]]
+name = "logging_performance"
+harness = false
+
+[[bench]]
+name = "writer_performance"
+harness = false
+
+[[bench]]
+name = "formatter_performance"
+harness = false
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[[example]]
+name = "basic_usage"
+required-features = ["std"]
+
+[[example]]
+name = "file_logging"
+required-features = ["file"]
+
+[[example]]
+name = "rotating_logs"
+required-features = ["rotating"]
